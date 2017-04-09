@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import os
 import sublime
 import sublime_plugin
 
@@ -14,13 +15,23 @@ class addsnippetCommand(sublime_plugin.TextCommand):
             dir = sublime.packages_path().replace('\\', '/') + '/' + dirname
             scope = self.view.scope_name(v[0].begin()).split()[0]
             dir_scope = dir + '/' + scope.split('.')[1]
-            s = self.view.substr(v[0])
-            l = ''.join([x for x in s.lower() if 96 < ord(x) < 123])
-            w = snippet % (s, s, l, scope)
-            fpath = dir_scope + '/' + l + '.sublime-snippet'
+            select_text = self.view.substr(v[0])
+            description = self.limitstr(select_text, 18)
+            name = self.limitstr(self.toalpha(select_text), 12, False)
+            trigger = self.limitstr(self.toalpha(select_text.split()[0]), 12, False)
+            write_text = snippet % (description, select_text, trigger, scope)
+            fpath = dir_scope + '/' + name + '.sublime-snippet'
             if not os.path.exists(dir) : os.mkdir(dir)
             if not os.path.exists(dir_scope) : os.mkdir(dir_scope)
-            with open(fpath, 'w') as f : f.write(w)
-            sublime.message_dialog(fpath + '\n' + w)
+            with open(fpath, 'w') as f : f.write(write_text)
+            sublime.message_dialog(name + '\n\n' + fpath + '\n\n' + write_text)
         except:
             pass
+    def limitstr(self, s, n, dot = True):
+        if n <= 3 or dot == False:
+            s = s[:n]
+        elif len(s) > n:
+            s = s[:n-3] + '...'
+        return s
+    def toalpha(self, s):
+        return ''.join([(x if 96 < ord(x) < 123 else '') for x in s.lower()])
