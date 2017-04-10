@@ -17,14 +17,12 @@ class addsnippetCommand(sublime_plugin.TextCommand):
             dir_scope = dir + '/' + scope.split('.')[1]
             select_text = self.view.substr(v[0])
             description = self.limitstr(select_text, 18)
-            name = self.limitstr(self.toalpha(select_text), 12, False)
-            trigger = self.limitstr(self.toalpha(select_text.split()[0]), 12, False)
-            write_text = snippet % (description, select_text, trigger, scope)
-            fpath = dir_scope + '/' + name + '.sublime-snippet'
+            write_text = snippet % (description, select_text, self.totrigger(select_text), scope)
+            fpath = dir_scope + '/' + self.toname(select_text) + '.sublime-snippet'
             if not os.path.exists(dir) : os.mkdir(dir)
             if not os.path.exists(dir_scope) : os.mkdir(dir_scope)
             with open(fpath, 'w') as f : f.write(write_text)
-            sublime.message_dialog(name + '\n\n' + fpath + '\n\n' + write_text)
+            sublime.message_dialog(self.toname(select_text) + '\n\n' + fpath + '\n\n' + write_text)
         except:
             pass
     def limitstr(self, s, n, dot = True):
@@ -33,5 +31,11 @@ class addsnippetCommand(sublime_plugin.TextCommand):
         elif len(s) > n:
             s = s[:n-3] + '...'
         return s
-    def toalpha(self, s):
-        return ''.join([(x if 96 < ord(x) < 123 else '') for x in s.lower()])
+    def toname(self, s):
+        return self.limitstr(''.join([(x if 96 < ord(x) < 123 else '_') for x in s.lower()]), 12, False)
+    def totrigger(self, s):
+        r = ''
+        for i in s.lower():
+            if not 96 < ord(i) < 123 : break
+            r += i
+        return self.limitstr(r, 12, False)
