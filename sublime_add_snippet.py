@@ -5,7 +5,7 @@ import sublime
 import sublime_plugin
 
 dirname = 'MyAddedSnippet'
-snippet = '<snippet>\n\t<description>%s</description>\n\t<content><![CDATA[%s]]></content>\n\t<tabTrigger>%s</tabTrigger>\n\t<scope>%s</scope>\n</snippet>'
+snippet = '<snippet>\n\t<description><![CDATA[%s]]></description>\n\t<content><![CDATA[%s]]></content>\n\t<tabTrigger>%s</tabTrigger>\n\t<scope>%s</scope>\n</snippet>'
 
 class addsnippetCommand(sublime_plugin.TextCommand):
     def run(self, edit):
